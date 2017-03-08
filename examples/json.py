@@ -1,5 +1,5 @@
-from mongoalchemy.document import Document
-from mongoalchemy.fields import StringField
+from ommongo.document import Document
+from ommongo.fields import StringField
 
 class A(Document):
     b = StringField()

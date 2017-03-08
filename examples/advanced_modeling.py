@@ -5,8 +5,8 @@ using forward and self-references
 '''
 
 
-from mongoalchemy.document import Document
-from mongoalchemy.fields import *
+from ommongo.document import Document
+from ommongo.fields import *
 from datetime import datetime
 from pprint import pprint
 class Event(Document):

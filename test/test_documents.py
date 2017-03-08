@@ -1,10 +1,10 @@
 from __future__ import print_function
-from mongoalchemy.py3compat import *
+from ommongo.py3compat import *
 
 from nose.tools import *
-from mongoalchemy.session import Session
-from mongoalchemy.document import *
-from mongoalchemy.fields import *
+from ommongo.session import Session
+from ommongo.document import *
+from ommongo.fields import *
 from test.util import known_failure
 
 # Document Types used in some tests
@@ -508,7 +508,7 @@ def test_dictdoc_setdefault():
 def test_set_dict_field():
     class TestDict(Document):
         data = DictField(AnythingField())
-    s = Session.connect('mongoalchemy-unit-testing')
+    s = Session.connect('ommongo-unit-testing')
     s.clear_collection(TestDict)
 
     td = TestDict()

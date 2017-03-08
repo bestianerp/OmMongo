@@ -21,9 +21,9 @@
 # THE SOFTWARE.
 
 from pprint import pprint
-from mongoalchemy.session import Session
-from mongoalchemy.document import Document, Index
-from mongoalchemy.fields import *
+from ommongo.session import Session
+from ommongo.document import Document, Index
+from ommongo.fields import *
 
 def main():
     class Address(Document):
@@ -45,23 +45,23 @@ def main():
             return '%s (%s)' % (self.name, self.email)
 
 
-    with Session.connect('mongoalchemy') as s:
+    with Session.connect('ommongo') as s:
         def print_all():
-            for u in s.query(User).filter(User.address.country == 'USA' ):
+            for u in s.query(User).filter(User.address.country == 'ID' ):
                 print u
 
         s.clear_collection(User)
 
-        a = Address(street_address='123 4th ave', city='NY', state_province='NY', country='USA')
-        u = User(name='jeff', email='jeff@qcircles.net', address=a)
+        a = Address(street_address='Jakarta Barat', city='JKT', state_province='JKT', country='ID')
+        u = User(name='OmMongo', email='ommongo@bapakode.org', address=a)
         s.save(u)
         print u.mongo_id
 
-        query = User.address.country == 'USA'
+        query = User.address.country == 'ID'
 
         print_all()
 
-        update = s.query(User).filter(User.name > 'ivan', User.name < 'katie' ).set(User.email, 'jeff2@qcircles.net')
+        update = s.query(User).filter(User.name > 'adi', User.name < 'oji' ).set(User.email, 'ommongo@bapakode.org')
         update.execute()
         print_all()
 

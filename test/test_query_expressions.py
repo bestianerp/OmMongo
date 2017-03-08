@@ -1,12 +1,12 @@
 from __future__ import print_function
-from mongoalchemy.py3compat import *
+from ommongo.py3compat import *
 
 from nose.tools import *
-from mongoalchemy.session import Session
-from mongoalchemy.document import Document, Index, FieldNotRetrieved
-from mongoalchemy.fields import *
-from mongoalchemy.query import BadQueryException, Query, BadResultException
-from mongoalchemy.query_expression import Q
+from ommongo.session import Session
+from ommongo.document import Document, Index, FieldNotRetrieved
+from ommongo.fields import *
+from ommongo.query import BadQueryException, Query, BadResultException
+from ommongo.query_expression import Q
 from test.util import known_failure
 
 

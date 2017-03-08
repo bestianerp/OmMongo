@@ -1,7 +1,7 @@
 
 # Create a mapping class
-from mongoalchemy.document import Document
-from mongoalchemy.fields import *
+from ommongo.document import Document
+from ommongo.fields import *
 
 class BloodDonor(Document):
     first_name = StringField()
@@ -16,8 +16,8 @@ class BloodDonor(Document):
 
 
 # Create A session, insert an object
-from mongoalchemy.session import Session
-session = Session.connect('mongoalchemy-tutorial')
+from ommongo.session import Session
+session = Session.connect('ommongo-tutorial')
 session.clear_collection(BloodDonor)
 
 donor = BloodDonor(first_name='Jeff', last_name='Jenkins',

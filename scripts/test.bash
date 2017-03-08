@@ -1,1 +1,0 @@
-nosetests --cover-tests --cover-erase --with-coverage --cover-package mongoalchemy

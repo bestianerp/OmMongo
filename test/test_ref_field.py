@@ -1,14 +1,14 @@
 from __future__ import print_function
-from mongoalchemy.py3compat import *
+from ommongo.py3compat import *
 
 from nose.tools import *
-from mongoalchemy.fields import *
+from ommongo.fields import *
 
-from mongoalchemy.exceptions import DocumentException, MissingValueException, \
+from ommongo.exceptions import DocumentException, MissingValueException, \
         ExtraValueException, FieldNotRetrieved, BadFieldSpecification, \
         BadReferenceException
-from mongoalchemy.document import Document, document_type_registry
-from mongoalchemy.session import Session
+from ommongo.document import Document, document_type_registry
+from ommongo.session import Session
 from test.util import known_failure
 from datetime import datetime
 from bson.dbref import DBRef

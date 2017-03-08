@@ -1,13 +1,13 @@
 from __future__ import print_function
-from mongoalchemy.py3compat import *
+from ommongo.py3compat import *
 
 import time
 from nose.tools import *
-from mongoalchemy.fields import *
+from ommongo.fields import *
 from test.util import known_failure
-from mongoalchemy.session import Session
-from mongoalchemy.document import Document, Index
-from mongoalchemy.query import Query
+from ommongo.session import Session
+from ommongo.document import Document, Index
+from ommongo.query import Query
 
 def get_session():
     return Session.connect('unit-testing')

@@ -1,11 +1,11 @@
 from __future__ import print_function
-from mongoalchemy.py3compat import *
+from ommongo.py3compat import *
 
 from nose.tools import *
-from mongoalchemy.session import Session
-from mongoalchemy.document import Document, Index
-from mongoalchemy.fields import *
-from mongoalchemy.exceptions import *
+from ommongo.session import Session
+from ommongo.document import Document, Index
+from ommongo.fields import *
+from ommongo.exceptions import *
 from test.util import known_failure
 from pymongo.errors import DuplicateKeyError, ConfigurationError
 import pymongo

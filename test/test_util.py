@@ -1,7 +1,7 @@
 from __future__ import print_function
-from mongoalchemy.py3compat import *
+from ommongo.py3compat import *
 
-from mongoalchemy.util import classproperty, UNSET
+from ommongo.util import classproperty, UNSET
 
 def test_class_properties():
     class A(object):

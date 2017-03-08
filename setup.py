@@ -2,21 +2,21 @@
 
 from distutils.core import setup
 
-VERSION = '0.21'
+VERSION = '0.1'
 DESCRIPTION = 'Document-Object Mapper/Toolkit for Mongo Databases'
 
 setup(
-    name='MongoAlchemy',
+    name='OmMongo',
     version=VERSION,
     description=DESCRIPTION,
-    author='Jeffrey Jenkins',
+    author='Bapakode Open Source',
     license='MIT',
-    author_email='jeff@qcircles.net',
-    url='http://mongoalchemy.org/',
-    packages=['mongoalchemy', 'mongoalchemy.fields'],
+    author_email='opensource@bapakode.org',
+    url='http://bapakode.org/ommongo',
+    packages=['ommongo', 'ommongo.fields'],
     install_requires=['pymongo'],
     classifiers = [
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 1 - Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',

@@ -1,8 +1,8 @@
 from __future__ import print_function
-from mongoalchemy.py3compat import *
+from ommongo.py3compat import *
 
 from nose.tools import *
-from mongoalchemy.fields import *
+from ommongo.fields import *
 from test.util import known_failure
 from datetime import datetime
 from bson.binary import Binary
@@ -168,8 +168,8 @@ def test_tz_unaware():
 
 def test_tz_aware():
     import pytz
-    from mongoalchemy.session import Session
-    from mongoalchemy.document import Document
+    from ommongo.session import Session
+    from ommongo.document import Document
     # doc
     class DocTZ(Document):
         time = DateTimeField(use_tz=True)
@@ -219,7 +219,7 @@ def objectid_wrong_type_unwrap_test():
     ObjectIdField().unwrap(1)
 
 def test_object_id_auto():
-    from mongoalchemy.document import Document
+    from ommongo.document import Document
     class A(Document):
         idf = ObjectIdField(auto=True, required=False)
     assert 'idf' in A().wrap()

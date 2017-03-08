@@ -1,5 +1,5 @@
-from mongoalchemy.document import Document
-from mongoalchemy.fields import *
+from ommongo.document import Document
+from ommongo.fields import *
 from datetime import datetime
 from pprint import pprint
 
@@ -13,8 +13,8 @@ class HashField(StringField):
 class User(Document):
     password = HashField()
 
-from mongoalchemy.session import Session
-session = Session.connect('mongoalchemy-tutorial')
+from ommongo.session import Session
+session = Session.connect('ommongo-tutorial')
 session.clear_collection(User)
 
 user = User(password='pw')

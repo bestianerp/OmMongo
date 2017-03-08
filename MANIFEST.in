@@ -1,3 +1,0 @@
-recursive-include mongoalchemy *.py
-prune test
-

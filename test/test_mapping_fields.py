@@ -1,8 +1,8 @@
 from __future__ import print_function
-from mongoalchemy.py3compat import *
+from ommongo.py3compat import *
 
 from nose.tools import *
-from mongoalchemy.fields import *
+from ommongo.fields import *
 from test.util import known_failure
 
 # DictField
