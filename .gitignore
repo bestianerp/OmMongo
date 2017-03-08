@@ -1,0 +1,8 @@
+docs/_*
+MANIFEST
+build/lib/
+dist
+*.pyc
+*.swp
+doctrees
+*.inv
