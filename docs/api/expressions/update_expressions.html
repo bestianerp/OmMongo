@@ -68,23 +68,79 @@
 <p>Updates are done by calling any of the update operations on a query object</p>
 <dl class="class">
 <dt id="ommongo.update_expression.UpdateExpression">
-<em class="property">class </em><code class="descclassname">ommongo.update_expression.</code><code class="descname">UpdateExpression</code><span class="sig-paren">(</span><em>query</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ommongo/update_expression.html#UpdateExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ommongo.update_expression.UpdateExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">ommongo.update_expression.</code><code class="descname">UpdateExpression</code><span class="sig-paren">(</span><em>query</em><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.update_expression.UpdateExpression" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
-<dt id="ommongo.update_expression.UpdateExpression.upsert">
-<code class="descname">upsert</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ommongo/update_expression.html#UpdateExpression.upsert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ommongo.update_expression.UpdateExpression.upsert" title="Permalink to this definition">¶</a></dt>
-<dd><p>If a document matching the query doesn&#8217;t exist, create one</p>
+<dt id="ommongo.update_expression.UpdateExpression.add_to_set">
+<code class="descname">add_to_set</code><span class="sig-paren">(</span><em>qfield</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.update_expression.UpdateExpression.add_to_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Atomically add <code class="docutils literal"><span class="pre">value</span></code> to <code class="docutils literal"><span class="pre">qfield</span></code>.  The field represented by
+<code class="docutils literal"><span class="pre">qfield</span></code> must be a set</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Requires server version <strong>1.3.0+</strong>.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="ommongo.update_expression.UpdateExpression.append">
+<code class="descname">append</code><span class="sig-paren">(</span><em>qfield</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.update_expression.UpdateExpression.append" title="Permalink to this definition">¶</a></dt>
+<dd><p>Atomically append <code class="docutils literal"><span class="pre">value</span></code> to <code class="docutils literal"><span class="pre">qfield</span></code>.  The operation will
+if the field is not a list field</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ommongo.update_expression.UpdateExpression.execute">
+<code class="descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.update_expression.UpdateExpression.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute the update expression on the database</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ommongo.update_expression.UpdateExpression.extend">
+<code class="descname">extend</code><span class="sig-paren">(</span><em>qfield</em>, <em>*value</em><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.update_expression.UpdateExpression.extend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Atomically append each value in <code class="docutils literal"><span class="pre">value</span></code> to the field <code class="docutils literal"><span class="pre">qfield</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ommongo.update_expression.UpdateExpression.inc">
+<code class="descname">inc</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.update_expression.UpdateExpression.inc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Atomically increment <code class="docutils literal"><span class="pre">qfield</span></code> by <code class="docutils literal"><span class="pre">value</span></code></p>
 </dd></dl>
 
 <dl class="method">
 <dt id="ommongo.update_expression.UpdateExpression.multi">
-<code class="descname">multi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ommongo/update_expression.html#UpdateExpression.multi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ommongo.update_expression.UpdateExpression.multi" title="Permalink to this definition">¶</a></dt>
+<code class="descname">multi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.update_expression.UpdateExpression.multi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update multiple documents.  The Mongo default is to only update
 the first matching document</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="ommongo.update_expression.UpdateExpression.pop_first">
+<code class="descname">pop_first</code><span class="sig-paren">(</span><em>qfield</em><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.update_expression.UpdateExpression.pop_first" title="Permalink to this definition">¶</a></dt>
+<dd><p>Atomically pop the first item in <code class="docutils literal"><span class="pre">qfield.</span></code>
+.. note:: Requires version <strong>1.1+</strong></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ommongo.update_expression.UpdateExpression.pop_last">
+<code class="descname">pop_last</code><span class="sig-paren">(</span><em>qfield</em><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.update_expression.UpdateExpression.pop_last" title="Permalink to this definition">¶</a></dt>
+<dd><p>Atomically pop the last item in <code class="docutils literal"><span class="pre">qfield.</span></code>
+.. note:: Requires version <strong>1.1+</strong></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ommongo.update_expression.UpdateExpression.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><em>qfield</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.update_expression.UpdateExpression.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Atomically remove <code class="docutils literal"><span class="pre">value</span></code> from <code class="docutils literal"><span class="pre">qfield</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ommongo.update_expression.UpdateExpression.remove_all">
+<code class="descname">remove_all</code><span class="sig-paren">(</span><em>qfield</em>, <em>*value</em><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.update_expression.UpdateExpression.remove_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Atomically remove each value in <code class="docutils literal"><span class="pre">value</span></code> from <code class="docutils literal"><span class="pre">qfield</span></code></p>
+</dd></dl>
+
+<dl class="method">
 <dt id="ommongo.update_expression.UpdateExpression.safe">
-<code class="descname">safe</code><span class="sig-paren">(</span><em>safe=True</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ommongo/update_expression.html#UpdateExpression.safe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ommongo.update_expression.UpdateExpression.safe" title="Permalink to this definition">¶</a></dt>
+<code class="descname">safe</code><span class="sig-paren">(</span><em>safe=True</em><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.update_expression.UpdateExpression.safe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Mark the query as a &#8220;safe&#8221; query with pymongo.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -98,7 +154,7 @@ the first matching document</p>
 
 <dl class="method">
 <dt id="ommongo.update_expression.UpdateExpression.set">
-<code class="descname">set</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ommongo/update_expression.html#UpdateExpression.set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ommongo.update_expression.UpdateExpression.set" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.update_expression.UpdateExpression.set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Usage is either:</p>
 <p>set(self, qfield, value): Atomically set <code class="docutils literal"><span class="pre">qfield</span></code> to <code class="docutils literal"><span class="pre">value</span></code></p>
 <p>OR</p>
@@ -109,71 +165,15 @@ update a sub-document</p>
 
 <dl class="method">
 <dt id="ommongo.update_expression.UpdateExpression.unset">
-<code class="descname">unset</code><span class="sig-paren">(</span><em>qfield</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ommongo/update_expression.html#UpdateExpression.unset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ommongo.update_expression.UpdateExpression.unset" title="Permalink to this definition">¶</a></dt>
+<code class="descname">unset</code><span class="sig-paren">(</span><em>qfield</em><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.update_expression.UpdateExpression.unset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Atomically delete the field <code class="docutils literal"><span class="pre">qfield</span></code>
 .. note:: Requires server version <strong>&gt;= 1.3.0+</strong>.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="ommongo.update_expression.UpdateExpression.inc">
-<code class="descname">inc</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ommongo/update_expression.html#UpdateExpression.inc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ommongo.update_expression.UpdateExpression.inc" title="Permalink to this definition">¶</a></dt>
-<dd><p>Atomically increment <code class="docutils literal"><span class="pre">qfield</span></code> by <code class="docutils literal"><span class="pre">value</span></code></p>
-</dd></dl>
-
-<dl class="method">
-<dt id="ommongo.update_expression.UpdateExpression.append">
-<code class="descname">append</code><span class="sig-paren">(</span><em>qfield</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ommongo/update_expression.html#UpdateExpression.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ommongo.update_expression.UpdateExpression.append" title="Permalink to this definition">¶</a></dt>
-<dd><p>Atomically append <code class="docutils literal"><span class="pre">value</span></code> to <code class="docutils literal"><span class="pre">qfield</span></code>.  The operation will
-if the field is not a list field</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="ommongo.update_expression.UpdateExpression.extend">
-<code class="descname">extend</code><span class="sig-paren">(</span><em>qfield</em>, <em>*value</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ommongo/update_expression.html#UpdateExpression.extend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ommongo.update_expression.UpdateExpression.extend" title="Permalink to this definition">¶</a></dt>
-<dd><p>Atomically append each value in <code class="docutils literal"><span class="pre">value</span></code> to the field <code class="docutils literal"><span class="pre">qfield</span></code></p>
-</dd></dl>
-
-<dl class="method">
-<dt id="ommongo.update_expression.UpdateExpression.remove">
-<code class="descname">remove</code><span class="sig-paren">(</span><em>qfield</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ommongo/update_expression.html#UpdateExpression.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ommongo.update_expression.UpdateExpression.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>Atomically remove <code class="docutils literal"><span class="pre">value</span></code> from <code class="docutils literal"><span class="pre">qfield</span></code></p>
-</dd></dl>
-
-<dl class="method">
-<dt id="ommongo.update_expression.UpdateExpression.remove_all">
-<code class="descname">remove_all</code><span class="sig-paren">(</span><em>qfield</em>, <em>*value</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ommongo/update_expression.html#UpdateExpression.remove_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ommongo.update_expression.UpdateExpression.remove_all" title="Permalink to this definition">¶</a></dt>
-<dd><p>Atomically remove each value in <code class="docutils literal"><span class="pre">value</span></code> from <code class="docutils literal"><span class="pre">qfield</span></code></p>
-</dd></dl>
-
-<dl class="method">
-<dt id="ommongo.update_expression.UpdateExpression.add_to_set">
-<code class="descname">add_to_set</code><span class="sig-paren">(</span><em>qfield</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ommongo/update_expression.html#UpdateExpression.add_to_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ommongo.update_expression.UpdateExpression.add_to_set" title="Permalink to this definition">¶</a></dt>
-<dd><p>Atomically add <code class="docutils literal"><span class="pre">value</span></code> to <code class="docutils literal"><span class="pre">qfield</span></code>.  The field represented by
-<code class="docutils literal"><span class="pre">qfield</span></code> must be a set</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Requires server version <strong>1.3.0+</strong>.</p>
-</div>
-</dd></dl>
-
-<dl class="method">
-<dt id="ommongo.update_expression.UpdateExpression.pop_last">
-<code class="descname">pop_last</code><span class="sig-paren">(</span><em>qfield</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ommongo/update_expression.html#UpdateExpression.pop_last"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ommongo.update_expression.UpdateExpression.pop_last" title="Permalink to this definition">¶</a></dt>
-<dd><p>Atomically pop the last item in <code class="docutils literal"><span class="pre">qfield.</span></code>
-.. note:: Requires version <strong>1.1+</strong></p>
-</dd></dl>
-
-<dl class="method">
-<dt id="ommongo.update_expression.UpdateExpression.pop_first">
-<code class="descname">pop_first</code><span class="sig-paren">(</span><em>qfield</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ommongo/update_expression.html#UpdateExpression.pop_first"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ommongo.update_expression.UpdateExpression.pop_first" title="Permalink to this definition">¶</a></dt>
-<dd><p>Atomically pop the first item in <code class="docutils literal"><span class="pre">qfield.</span></code>
-.. note:: Requires version <strong>1.1+</strong></p>
-</dd></dl>
-
-<dl class="method">
-<dt id="ommongo.update_expression.UpdateExpression.execute">
-<code class="descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ommongo/update_expression.html#UpdateExpression.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ommongo.update_expression.UpdateExpression.execute" title="Permalink to this definition">¶</a></dt>
-<dd><p>Execute the update expression on the database</p>
+<dt id="ommongo.update_expression.UpdateExpression.upsert">
+<code class="descname">upsert</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.update_expression.UpdateExpression.upsert" title="Permalink to this definition">¶</a></dt>
+<dd><p>If a document matching the query doesn&#8217;t exist, create one</p>
 </dd></dl>
 
 </dd></dl>
@@ -185,7 +185,7 @@ if the field is not a list field</p>
 They have the same filtering methods as querying.</p>
 <dl class="class">
 <dt id="ommongo.query.RemoveQuery">
-<em class="property">class </em><code class="descclassname">ommongo.query.</code><code class="descname">RemoveQuery</code><span class="sig-paren">(</span><em>type</em>, <em>session</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ommongo/query.html#RemoveQuery"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ommongo.query.RemoveQuery" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">ommongo.query.</code><code class="descname">RemoveQuery</code><span class="sig-paren">(</span><em>type</em>, <em>session</em><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.query.RemoveQuery" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute a remove query to remove the matched objects from the database</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -199,6 +199,45 @@ They have the same filtering methods as querying.</p>
 </tr>
 </tbody>
 </table>
+<dl class="method">
+<dt id="ommongo.query.RemoveQuery.execute">
+<code class="descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.query.RemoveQuery.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the remove command on the session.  Return the result of
+<code class="docutils literal"><span class="pre">getLastError</span></code> if <code class="docutils literal"><span class="pre">safe</span></code> is <code class="docutils literal"><span class="pre">True</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ommongo.query.RemoveQuery.filter">
+<code class="descname">filter</code><span class="sig-paren">(</span><em>*query_expressions</em><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.query.RemoveQuery.filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter the remove expression with <code class="docutils literal"><span class="pre">*query_expressions</span></code>, as in
+the <code class="docutils literal"><span class="pre">Query</span></code> filter method.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ommongo.query.RemoveQuery.filter_by">
+<code class="descname">filter_by</code><span class="sig-paren">(</span><em>**filters</em><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.query.RemoveQuery.filter_by" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter for the names in <code class="docutils literal"><span class="pre">filters</span></code> being equal to the associated
+values.  Cannot be used for sub-objects since keys must be strings</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ommongo.query.RemoveQuery.in_">
+<code class="descname">in_</code><span class="sig-paren">(</span><em>qfield</em>, <em>*values</em><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.query.RemoveQuery.in_" title="Permalink to this definition">¶</a></dt>
+<dd><p>Works the same as the query expression method <code class="docutils literal"><span class="pre">in_</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ommongo.query.RemoveQuery.nin">
+<code class="descname">nin</code><span class="sig-paren">(</span><em>qfield</em>, <em>*values</em><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.query.RemoveQuery.nin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Works the same as the query expression method <code class="docutils literal"><span class="pre">nin_</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ommongo.query.RemoveQuery.or_">
+<code class="descname">or_</code><span class="sig-paren">(</span><em>first_qe</em>, <em>*qes</em><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.query.RemoveQuery.or_" title="Permalink to this definition">¶</a></dt>
+<dd><p>Works the same as the query expression method <code class="docutils literal"><span class="pre">or_</span></code></p>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="ommongo.query.RemoveQuery.query">
 <code class="descname">query</code><a class="headerlink" href="#ommongo.query.RemoveQuery.query" title="Permalink to this definition">¶</a></dt>
@@ -206,49 +245,10 @@ They have the same filtering methods as querying.</p>
 
 <dl class="method">
 <dt id="ommongo.query.RemoveQuery.set_safe">
-<code class="descname">set_safe</code><span class="sig-paren">(</span><em>is_safe</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ommongo/query.html#RemoveQuery.set_safe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ommongo.query.RemoveQuery.set_safe" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_safe</code><span class="sig-paren">(</span><em>is_safe</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.query.RemoveQuery.set_safe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set this remove to be safe.  It will call getLastError after the
 remove to make sure it was successful.  <code class="docutils literal"><span class="pre">**kwargs</span></code> are parameters to
 MongoDB&#8217;s getLastError command (as in pymongo&#8217;s remove).</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="ommongo.query.RemoveQuery.execute">
-<code class="descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ommongo/query.html#RemoveQuery.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ommongo.query.RemoveQuery.execute" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run the remove command on the session.  Return the result of
-<code class="docutils literal"><span class="pre">getLastError</span></code> if <code class="docutils literal"><span class="pre">safe</span></code> is <code class="docutils literal"><span class="pre">True</span></code></p>
-</dd></dl>
-
-<dl class="method">
-<dt id="ommongo.query.RemoveQuery.filter">
-<code class="descname">filter</code><span class="sig-paren">(</span><em>*query_expressions</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ommongo/query.html#RemoveQuery.filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ommongo.query.RemoveQuery.filter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Filter the remove expression with <code class="docutils literal"><span class="pre">*query_expressions</span></code>, as in
-the <code class="docutils literal"><span class="pre">Query</span></code> filter method.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="ommongo.query.RemoveQuery.filter_by">
-<code class="descname">filter_by</code><span class="sig-paren">(</span><em>**filters</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ommongo/query.html#RemoveQuery.filter_by"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ommongo.query.RemoveQuery.filter_by" title="Permalink to this definition">¶</a></dt>
-<dd><p>Filter for the names in <code class="docutils literal"><span class="pre">filters</span></code> being equal to the associated
-values.  Cannot be used for sub-objects since keys must be strings</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="ommongo.query.RemoveQuery.or_">
-<code class="descname">or_</code><span class="sig-paren">(</span><em>first_qe</em>, <em>*qes</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ommongo/query.html#RemoveQuery.or_"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ommongo.query.RemoveQuery.or_" title="Permalink to this definition">¶</a></dt>
-<dd><p>Works the same as the query expression method <code class="docutils literal"><span class="pre">or_</span></code></p>
-</dd></dl>
-
-<dl class="method">
-<dt id="ommongo.query.RemoveQuery.in_">
-<code class="descname">in_</code><span class="sig-paren">(</span><em>qfield</em>, <em>*values</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ommongo/query.html#RemoveQuery.in_"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ommongo.query.RemoveQuery.in_" title="Permalink to this definition">¶</a></dt>
-<dd><p>Works the same as the query expression method <code class="docutils literal"><span class="pre">in_</span></code></p>
-</dd></dl>
-
-<dl class="method">
-<dt id="ommongo.query.RemoveQuery.nin">
-<code class="descname">nin</code><span class="sig-paren">(</span><em>qfield</em>, <em>*values</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ommongo/query.html#RemoveQuery.nin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ommongo.query.RemoveQuery.nin" title="Permalink to this definition">¶</a></dt>
-<dd><p>Works the same as the query expression method <code class="docutils literal"><span class="pre">nin_</span></code></p>
 </dd></dl>
 
 </dd></dl>
@@ -259,14 +259,8 @@ values.  Cannot be used for sub-objects since keys must be strings</p>
 <p>Find and modify is done by calling find_and_modify on a query object</p>
 <dl class="class">
 <dt id="ommongo.update_expression.FindAndModifyExpression">
-<em class="property">class </em><code class="descclassname">ommongo.update_expression.</code><code class="descname">FindAndModifyExpression</code><span class="sig-paren">(</span><em>query</em>, <em>new</em>, <em>remove</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ommongo/update_expression.html#FindAndModifyExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ommongo.update_expression.FindAndModifyExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">ommongo.update_expression.</code><code class="descname">FindAndModifyExpression</code><span class="sig-paren">(</span><em>query</em>, <em>new</em>, <em>remove</em><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.update_expression.FindAndModifyExpression" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
-<dt id="ommongo.update_expression.FindAndModifyExpression.execute">
-<code class="descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ommongo/update_expression.html#FindAndModifyExpression.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ommongo.update_expression.FindAndModifyExpression.execute" title="Permalink to this definition">¶</a></dt>
-<dd><p>Execute the find and modify expression on the database</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="ommongo.update_expression.FindAndModifyExpression.add_to_set">
 <code class="descname">add_to_set</code><span class="sig-paren">(</span><em>qfield</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.update_expression.FindAndModifyExpression.add_to_set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Atomically add <code class="docutils literal"><span class="pre">value</span></code> to <code class="docutils literal"><span class="pre">qfield</span></code>.  The field represented by
@@ -282,6 +276,12 @@ values.  Cannot be used for sub-objects since keys must be strings</p>
 <code class="descname">append</code><span class="sig-paren">(</span><em>qfield</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.update_expression.FindAndModifyExpression.append" title="Permalink to this definition">¶</a></dt>
 <dd><p>Atomically append <code class="docutils literal"><span class="pre">value</span></code> to <code class="docutils literal"><span class="pre">qfield</span></code>.  The operation will
 if the field is not a list field</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ommongo.update_expression.FindAndModifyExpression.execute">
+<code class="descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.update_expression.FindAndModifyExpression.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute the find and modify expression on the database</p>
 </dd></dl>
 
 <dl class="method">

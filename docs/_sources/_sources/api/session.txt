@@ -1,0 +1,7 @@
+
+Session
+========================================
+
+.. automodule:: ommongo.session
+   :members:
+   :undoc-members:

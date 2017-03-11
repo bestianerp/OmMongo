@@ -1,0 +1,19 @@
+Documents and Indexes
+=======================================
+
+.. automodule:: ommongo.document
+
+
+:class:`Document`
+----------------------------------------------------------
+
+.. autoclass:: ommongo.document.Document
+   :members:
+   :undoc-members:
+
+:class:`Index`
+----------------------------------------------------------
+.. autoclass:: ommongo.document.Index
+   :members:
+   :undoc-members:
+

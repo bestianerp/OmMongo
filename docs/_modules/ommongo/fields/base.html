@@ -1,0 +1,498 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ommongo.fields.base &#8212; OmMongo 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+     
+    
+    <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    
+    
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">OmMongo 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for ommongo.fields.base</h1><div class="highlight"><pre>
+<span></span><span class="c1"># The MIT License</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2010 Jeffrey Jenkins</span>
+<span class="c1">#</span>
+<span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># in the Software without restriction, including without limitation the rights</span>
+<span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
+<span class="c1"># furnished to do so, subject to the following conditions:</span>
+<span class="c1">#</span>
+<span class="c1"># The above copyright notice and this permission notice shall be included in</span>
+<span class="c1"># all copies or substantial portions of the Software.</span>
+<span class="c1">#</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="c1"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</span>
+<span class="c1"># THE SOFTWARE.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">:class:`Field` objects transform python objects into objects which can</span>
+<span class="sd">be stored as a value in a MongoDB document.  They control the conversions and</span>
+<span class="sd">validation of the data.</span>
+
+<span class="sd">If you want to define your own type of :class:`Field` there are four methods</span>
+<span class="sd">a subclass must implement:</span>
+
+<span class="sd">* :func:`Field.wrap` --- Takes a value and returns an object composed entirely \</span>
+<span class="sd">    of types that MongoDB understands (dicts, lists, numbers, strings, datetimes, etc.)</span>
+<span class="sd">* :func:`Field.unwrap` --- Takes a value in the format produced by :func:`~Field.wrap` and</span>
+<span class="sd">    returns a python object.</span>
+
+<span class="sd">:func:`~Field.wrap` and :func:`~Field.unwrap` should be inverse operations.</span>
+<span class="sd">In particular, ``field.unwrap(field.wrap(obj))`` == obj should always be true.</span>
+
+<span class="sd">* :func:`Field.validate_wrap` --- Raises a :class:`BadValueException` if calling :func:`~Field.wrap` will \</span>
+<span class="sd">    fail.  This function should be fast, as it will be called whenever a value</span>
+<span class="sd">    is set on a document for this type of field.</span>
+<span class="sd">* :func:`Field.validate_unwrap` --- Raises a :class:`BadValueException` if calling :func:`~Field.unwrap` will \</span>
+<span class="sd">    fail.</span>
+
+<span class="sd">To just check whether something is valid for wrapping or unwrapping, each field has a</span>
+<span class="sd">:func:`Field.is_valid_wrap` and an :func:`Field.is_valid_unwrap` function which call</span>
+<span class="sd">their respective validation function, returning True if a</span>
+<span class="sd">:class:`BadValueException` is not raised.</span>
+
+
+<span class="sd">The documentation for each :class:`Field` class will largely just be giving the input and</span>
+<span class="sd">output types for :func:`~Field.wrap` and :func:`~Field.unwrap`.</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">ommongo.py3compat</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">bson.objectid</span> <span class="k">import</span> <span class="n">ObjectId</span>
+<span class="kn">from</span> <span class="nn">bson.binary</span> <span class="k">import</span> <span class="n">Binary</span>
+<span class="kn">from</span> <span class="nn">bson.dbref</span> <span class="k">import</span> <span class="n">DBRef</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
+
+<span class="kn">from</span> <span class="nn">ommongo.util</span> <span class="k">import</span> <span class="n">UNSET</span>
+<span class="kn">from</span> <span class="nn">ommongo.query_expression</span> <span class="k">import</span> <span class="n">QueryField</span>
+<span class="kn">from</span> <span class="nn">ommongo.exceptions</span> <span class="k">import</span> <span class="n">BadValueException</span><span class="p">,</span> <span class="n">FieldNotRetrieved</span><span class="p">,</span> <span class="n">InvalidConfigException</span><span class="p">,</span> <span class="n">BadFieldSpecification</span><span class="p">,</span> <span class="n">MissingValueException</span>
+
+<span class="n">SCALAR_MODIFIERS</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s1">&#39;$set&#39;</span><span class="p">,</span> <span class="s1">&#39;$unset&#39;</span><span class="p">])</span>
+<span class="n">NUMBER_MODIFIERS</span> <span class="o">=</span> <span class="n">SCALAR_MODIFIERS</span> <span class="o">|</span> <span class="nb">set</span><span class="p">([</span><span class="s1">&#39;$inc&#39;</span><span class="p">])</span>
+<span class="n">LIST_MODIFIERS</span> <span class="o">=</span> <span class="n">SCALAR_MODIFIERS</span> <span class="o">|</span> <span class="nb">set</span><span class="p">([</span><span class="s1">&#39;$push&#39;</span><span class="p">,</span> <span class="s1">&#39;$addToSet&#39;</span><span class="p">,</span> <span class="s1">&#39;$pull&#39;</span><span class="p">,</span> <span class="s1">&#39;$pushAll&#39;</span><span class="p">,</span> <span class="s1">&#39;$pullAll&#39;</span><span class="p">,</span> <span class="s1">&#39;$pop&#39;</span><span class="p">])</span>
+<span class="n">ANY_MODIFIER</span> <span class="o">=</span> <span class="n">LIST_MODIFIERS</span> <span class="o">|</span> <span class="n">NUMBER_MODIFIERS</span>
+
+<span class="k">class</span> <span class="nc">FieldMeta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="n">mcs</span><span class="p">,</span> <span class="n">classname</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">class_dict</span><span class="p">):</span>
+
+        <span class="k">def</span> <span class="nf">wrap_unwrap_wrapper</span><span class="p">(</span><span class="n">fun</span><span class="p">):</span>
+            <span class="k">def</span> <span class="nf">wrapped</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_allow_none</span> <span class="ow">and</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">None</span>
+                <span class="k">return</span> <span class="n">fun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
+            <span class="n">functools</span><span class="o">.</span><span class="n">update_wrapper</span><span class="p">(</span><span class="n">wrapped</span><span class="p">,</span> <span class="n">fun</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;__name__&#39;</span><span class="p">,</span> <span class="s1">&#39;__doc__&#39;</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">wrapped</span>
+
+        <span class="k">def</span> <span class="nf">validation_wrapper</span><span class="p">(</span><span class="n">fun</span><span class="p">,</span> <span class="n">kind</span><span class="p">):</span>
+            <span class="k">def</span> <span class="nf">wrapped</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">):</span>
+                <span class="c1"># Handle None</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_allow_none</span> <span class="ow">and</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">return</span>
+                <span class="c1"># Standard Field validation</span>
+                <span class="n">fun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
+
+                <span class="c1"># Universal user-supplied validator</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_fail_validation</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;user-supplied validator failed&#39;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s1">&#39;unwrap&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">unwrap_validator</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">unwrap_validator</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_fail_validation</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;user-supplied unwrap_validator failed&#39;</span><span class="p">)</span>
+
+                <span class="k">elif</span> <span class="n">kind</span> <span class="o">==</span> <span class="s1">&#39;wrap&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrap_validator</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrap_validator</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_fail_validation</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;user-supplied wrap_validator failed&#39;</span><span class="p">)</span>
+
+            <span class="n">functools</span><span class="o">.</span><span class="n">update_wrapper</span><span class="p">(</span><span class="n">wrapped</span><span class="p">,</span> <span class="n">fun</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;__name__&#39;</span><span class="p">,</span> <span class="s1">&#39;__doc__&#39;</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">wrapped</span>
+
+        <span class="k">if</span> <span class="s1">&#39;wrap&#39;</span> <span class="ow">in</span> <span class="n">class_dict</span><span class="p">:</span>
+            <span class="n">class_dict</span><span class="p">[</span><span class="s1">&#39;wrap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wrap_unwrap_wrapper</span><span class="p">(</span><span class="n">class_dict</span><span class="p">[</span><span class="s1">&#39;wrap&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s1">&#39;unwrap&#39;</span> <span class="ow">in</span> <span class="n">class_dict</span><span class="p">:</span>
+            <span class="n">class_dict</span><span class="p">[</span><span class="s1">&#39;unwrap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wrap_unwrap_wrapper</span><span class="p">(</span><span class="n">class_dict</span><span class="p">[</span><span class="s1">&#39;unwrap&#39;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="s1">&#39;validate_wrap&#39;</span> <span class="ow">in</span> <span class="n">class_dict</span><span class="p">:</span>
+            <span class="n">class_dict</span><span class="p">[</span><span class="s1">&#39;validate_wrap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">validation_wrapper</span><span class="p">(</span><span class="n">class_dict</span><span class="p">[</span><span class="s1">&#39;validate_wrap&#39;</span><span class="p">],</span> <span class="s1">&#39;wrap&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;validate_unwrap&#39;</span> <span class="ow">in</span> <span class="n">class_dict</span><span class="p">:</span>
+            <span class="n">class_dict</span><span class="p">[</span><span class="s1">&#39;validate_unwrap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">validation_wrapper</span><span class="p">(</span><span class="n">class_dict</span><span class="p">[</span><span class="s1">&#39;validate_unwrap&#39;</span><span class="p">],</span> <span class="s1">&#39;unwrap&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Create Class</span>
+        <span class="k">return</span> <span class="nb">type</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="n">mcs</span><span class="p">,</span> <span class="n">classname</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">class_dict</span><span class="p">)</span>
+
+<span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">FieldMeta</span><span class="p">)</span>
+<div class="viewcode-block" id="Field"><a class="viewcode-back" href="../../../api/schema/fields.html#ommongo.fields.Field">[docs]</a><span class="k">class</span> <span class="nc">Field</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1">#: If this kind of field can have sub-fields, this attribute should be True</span>
+    <span class="n">has_subfields</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1">#: If this kind of field can do extra requests, this attribute should be True</span>
+    <span class="n">has_autoload</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1">#: Is this a sequence?  used by elemMatch</span>
+    <span class="n">is_sequence_field</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">no_real_attributes</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># used for free-form queries.</span>
+
+    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">FieldMeta</span>
+
+    <span class="n">valid_modifiers</span> <span class="o">=</span> <span class="n">SCALAR_MODIFIERS</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">UNSET</span><span class="p">,</span> <span class="n">default_f</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">db_field</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_none</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">on_update</span><span class="o">=</span><span class="s1">&#39;$set&#39;</span><span class="p">,</span>
+                 <span class="n">validator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">unwrap_validator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">wrap_validator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">_id</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">proxy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">iproxy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ignore_missing</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            :param required: The field must be passed when constructing a document (optional. default: ``True``)</span>
+<span class="sd">            :param default:  Default value to use if one is not given (optional.)</span>
+<span class="sd">            :param db_field: name to use when saving or loading this field from the database \</span>
+<span class="sd">                (optional.  default is the name the field is assigned to on a documet)</span>
+<span class="sd">            :param allow_none: allow ``None`` as a value (optional. default: False)</span>
+<span class="sd">            :param validator: a callable which will be called on objects when wrapping/unwrapping</span>
+<span class="sd">            :param unwrap_validator: a callable which will be called on objects when unwrapping</span>
+<span class="sd">            :param wrap_validator: a callable which will be called on objects when wrapping</span>
+<span class="sd">            :param _id: Set the db_field to _id.  If a field has this the &quot;mongo_id&quot; field will \</span>
+<span class="sd">                also be removed from the document the field is on.</span>
+
+<span class="sd">            The general validator is called after the field&#39;s validator, but before</span>
+<span class="sd">            either of the wrap/unwrap versions.  The validator should raise a BadValueException</span>
+<span class="sd">            if it fails, but if it returns False the field will raise an exception with</span>
+<span class="sd">            a generic message.</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">_id</span> <span class="ow">and</span> <span class="n">db_field</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidConfigException</span><span class="p">(</span><span class="s1">&#39;Cannot set db_field and _id on the same Field&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">_id</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__db_field</span> <span class="o">=</span> <span class="s1">&#39;_id&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__db_field</span> <span class="o">=</span> <span class="n">db_field</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__db_field</span> <span class="o">==</span> <span class="s1">&#39;_id&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">=</span> <span class="n">UNSET</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__update_op</span> <span class="o">=</span> <span class="n">UNSET</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span> <span class="o">=</span> <span class="n">proxy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iproxy</span> <span class="o">=</span> <span class="n">iproxy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ignore_missing</span> <span class="o">=</span> <span class="n">ignore_missing</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">validator</span> <span class="o">=</span> <span class="n">validator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unwrap_validator</span> <span class="o">=</span> <span class="n">unwrap_validator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wrap_validator</span> <span class="o">=</span> <span class="n">wrap_validator</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_allow_none</span> <span class="o">=</span> <span class="n">allow_none</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="n">required</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_default</span> <span class="o">=</span> <span class="n">default</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_default_f</span> <span class="o">=</span> <span class="n">default_f</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_f</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default</span> <span class="o">!=</span> <span class="n">UNSET</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidConfigException</span><span class="p">(</span><span class="s1">&#39;Only one of default and default_f &#39;</span>
+                                         <span class="s1">&#39;is allowed&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_allow_none</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_owner</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">on_update</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_modifiers</span> <span class="ow">and</span> <span class="n">on_update</span> <span class="o">!=</span> <span class="s1">&#39;ignore&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidConfigException</span><span class="p">(</span><span class="s1">&#39;Unsupported update operation: </span><span class="si">%s</span><span class="s1">&#39;</span>
+                                         <span class="o">%</span> <span class="n">on_update</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_update</span> <span class="o">=</span> <span class="n">on_update</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span>  <span class="s1">&#39;Unbound_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_f</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default</span>
+
+    <span class="k">def</span> <span class="nf">schema_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">schema</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">required</span><span class="p">,</span>
+            <span class="n">db_field</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__db_field</span><span class="p">,</span>
+            <span class="n">allow_none</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_allow_none</span><span class="p">,</span>
+            <span class="n">on_update</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">on_update</span><span class="p">,</span>
+            <span class="n">validator_set</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">validator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">unwrap_validator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">unwrap_validator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">wrap_validator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">wrap_validator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">ignore_missing</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ignore_missing</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default</span> <span class="o">==</span> <span class="n">UNSET</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_f</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">schema</span><span class="p">[</span><span class="s1">&#39;default_unset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_f</span><span class="p">:</span>
+            <span class="n">schema</span><span class="p">[</span><span class="s1">&#39;default_f&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_default_f</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">schema</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_default</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">schema</span>
+
+
+    <span class="k">def</span> <span class="nf">__get__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">owner</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">instance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">QueryField</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">obj_value</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">]</span>
+
+        <span class="c1"># if the value is set, just return it</span>
+        <span class="k">if</span> <span class="n">obj_value</span><span class="o">.</span><span class="n">set</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">instance</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="c1"># if not, try the default</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_f</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_f</span><span class="p">())</span>
+            <span class="k">return</span> <span class="n">instance</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">UNSET</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">instance</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="c1"># If this value wasn&#39;t retrieved, raise a specific exception</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">obj_value</span><span class="o">.</span><span class="n">retrieved</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FieldNotRetrieved</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">)</span>
+
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">__set__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">set_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_wrap</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">obj_value</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">]</span>
+        <span class="n">obj_value</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="n">obj_value</span><span class="o">.</span><span class="n">dirty</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">obj_value</span><span class="o">.</span><span class="n">set</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">obj_value</span><span class="o">.</span><span class="n">from_db</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_update</span> <span class="o">!=</span> <span class="s1">&#39;ignore&#39;</span><span class="p">:</span>
+            <span class="n">obj_value</span><span class="o">.</span><span class="n">update_op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_update</span>
+
+    <span class="k">def</span> <span class="nf">dirty_ops</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">):</span>
+        <span class="n">obj_value</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">]</span>
+        <span class="c1"># op = instance._dirty.get(self._name)</span>
+        <span class="k">if</span> <span class="n">obj_value</span><span class="o">.</span><span class="n">update_op</span> <span class="o">==</span> <span class="s1">&#39;$unset&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;$unset&#39;</span> <span class="p">:</span> <span class="p">{</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="p">:</span> <span class="kc">True</span> <span class="p">}</span> <span class="p">}</span>
+        <span class="k">if</span> <span class="n">obj_value</span><span class="o">.</span><span class="n">update_op</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{}</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">obj_value</span><span class="o">.</span><span class="n">update_op</span> <span class="p">:</span> <span class="p">{</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">db_field</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">obj_value</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">__delete__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">):</span>
+        <span class="n">obj_value</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">obj_value</span><span class="o">.</span><span class="n">set</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">)</span>
+        <span class="n">obj_value</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="c1"># if self._name not in instance._field_values:</span>
+        <span class="c1">#     raise AttributeError(self._name)</span>
+        <span class="c1"># del instance._field_values[self._name]</span>
+        <span class="c1"># instance._dirty[self._name] = &#39;$unset&#39;</span>
+
+    <span class="k">def</span> <span class="nf">update_ops</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">obj_value</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">obj_value</span><span class="o">.</span><span class="n">set</span> <span class="ow">and</span> <span class="p">(</span><span class="n">obj_value</span><span class="o">.</span><span class="n">dirty</span> <span class="ow">or</span> <span class="n">force</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">on_update</span> <span class="p">:</span> <span class="p">{</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">obj_value</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="k">return</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">localize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">db_field</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; The name to use when setting this field on a document.  If</span>
+<span class="sd">            ``db_field`` is passed to the constructor, that is returned.  Otherwise</span>
+<span class="sd">            the value is the name which this field was assigned to on the owning</span>
+<span class="sd">            document.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__db_field</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__db_field</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+
+    <span class="k">def</span> <span class="nf">wrap_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Wrap ``value`` for use as the value in a Mongo query, for example</span>
+<span class="sd">            in $in&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+
+    <span class="k">def</span> <span class="nf">_set_parent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_parent_on_subtypes</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">set_parent_on_subtypes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; This function sets the parent on any sub-Fields of this field. It</span>
+<span class="sd">            should be overridden by SequenceField and field which has subtypes</span>
+<span class="sd">            (such as SequenceField and DictField).</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Returns an object suitable for setting as a value on a MongoDB object.</span>
+<span class="sd">            Raises ``NotImplementedError`` in the base class.</span>
+
+<span class="sd">            :param value: The value to convert.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">unwrap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Returns an object suitable for setting as a value on a subclass of</span>
+<span class="sd">            :class:`~ommongo.document.Document`.</span>
+<span class="sd">            Raises ``NotImplementedError`` in the base class.</span>
+
+<span class="sd">            :param value: The value to convert.</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">validate_wrap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Called before wrapping.  Calls :func:`~Field.is_valid_wrap` and</span>
+<span class="sd">            raises a :class:`BadValueException` if validation fails</span>
+
+<span class="sd">            :param value: The value to validate</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">validate_unwrap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Called before unwrapping.  Calls :func:`~Field.is_valid_unwrap` and raises</span>
+<span class="sd">            a :class:`BadValueException` if validation fails</span>
+
+<span class="sd">            .. note::</span>
+<span class="sd">                ``is_valid_unwrap`` calls ``is_valid_wrap``, so any class without</span>
+<span class="sd">                a is_valid_unwrap function is inheriting that behaviour.</span>
+
+<span class="sd">            :param value: The value to check</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_wrap</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_fail_validation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">cause</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">BadValueException</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">reason</span><span class="p">,</span> <span class="n">cause</span><span class="o">=</span><span class="n">cause</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_fail_validation_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">*</span><span class="nb">type</span><span class="p">):</span>
+        <span class="n">types</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">type</span><span class="p">])</span>
+        <span class="n">got</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="k">raise</span> <span class="n">BadValueException</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="s1">&#39;Value is not an instance of </span><span class="si">%s</span><span class="s1"> (got: </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">types</span><span class="p">,</span> <span class="n">got</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">is_valid_wrap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Returns whether ``value`` is a valid value to wrap.</span>
+<span class="sd">            Raises ``NotImplementedError`` in the base class.</span>
+
+<span class="sd">            :param value: The value to check</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">validate_wrap</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">BadValueException</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">is_valid_unwrap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Returns whether ``value`` is a valid value to unwrap.</span>
+<span class="sd">            Raises ``NotImplementedError`` in the base class.</span>
+
+<span class="sd">            :param value: The value to check</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">validate_unwrap</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">BadValueException</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    
+
+    
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Bapakode Open Source.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+    
+
+  </body>
+</html>
