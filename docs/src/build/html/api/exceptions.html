@@ -1,0 +1,285 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Exceptions &#8212; OmMongo 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Examples" href="../examples/index.html" />
+    <link rel="prev" title="Update Expressions" href="expressions/update_expressions.html" />
+     
+    
+    <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    
+    
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../examples/index.html" title="Examples"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="expressions/update_expressions.html" title="Update Expressions"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">OmMongo 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">API documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="exceptions">
+<h1>Exceptions<a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="field-exceptions">
+<h2>Field Exceptions<a class="headerlink" href="#field-exceptions" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="ommongo.exceptions.BadValueException">
+<em class="property">exception </em><code class="descclassname">ommongo.exceptions.</code><code class="descname">BadValueException</code><span class="sig-paren">(</span><em>name</em>, <em>value</em>, <em>reason</em>, <em>cause=None</em><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.exceptions.BadValueException" title="Permalink to this definition">¶</a></dt>
+<dd><p>An exception which is raised when there is something wrong with a
+value</p>
+<dl class="method">
+<dt id="ommongo.exceptions.BadValueException.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.exceptions.BadValueException.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) &#8211;
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="ommongo.exceptions.BadFieldSpecification">
+<em class="property">exception </em><code class="descclassname">ommongo.exceptions.</code><code class="descname">BadFieldSpecification</code><a class="headerlink" href="#ommongo.exceptions.BadFieldSpecification" title="Permalink to this definition">¶</a></dt>
+<dd><p>An exception that is raised when there is an error in creating a
+field</p>
+<dl class="method">
+<dt id="ommongo.exceptions.BadFieldSpecification.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.exceptions.BadFieldSpecification.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) &#8211;
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="document-exceptions">
+<h2>Document Exceptions<a class="headerlink" href="#document-exceptions" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="ommongo.exceptions.DocumentException">
+<em class="property">exception </em><code class="descclassname">ommongo.exceptions.</code><code class="descname">DocumentException</code><a class="headerlink" href="#ommongo.exceptions.DocumentException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base for all document-related exceptions</p>
+<dl class="method">
+<dt id="ommongo.exceptions.DocumentException.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.exceptions.DocumentException.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) &#8211;
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="ommongo.exceptions.MissingValueException">
+<em class="property">exception </em><code class="descclassname">ommongo.exceptions.</code><code class="descname">MissingValueException</code><a class="headerlink" href="#ommongo.exceptions.MissingValueException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised when a required field isn&#8217;t set</p>
+<dl class="method">
+<dt id="ommongo.exceptions.MissingValueException.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.exceptions.MissingValueException.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) &#8211;
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="ommongo.exceptions.ExtraValueException">
+<em class="property">exception </em><code class="descclassname">ommongo.exceptions.</code><code class="descname">ExtraValueException</code><a class="headerlink" href="#ommongo.exceptions.ExtraValueException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised when a value is passed in with no corresponding field</p>
+<dl class="method">
+<dt id="ommongo.exceptions.ExtraValueException.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.exceptions.ExtraValueException.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) &#8211;
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="ommongo.exceptions.FieldNotRetrieved">
+<em class="property">exception </em><code class="descclassname">ommongo.exceptions.</code><code class="descname">FieldNotRetrieved</code><a class="headerlink" href="#ommongo.exceptions.FieldNotRetrieved" title="Permalink to this definition">¶</a></dt>
+<dd><p>If a partial document is loaded from the database and a field which
+wasn&#8217;t retrieved is accessed this exception is raised</p>
+<dl class="method">
+<dt id="ommongo.exceptions.FieldNotRetrieved.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.exceptions.FieldNotRetrieved.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) &#8211;
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="ommongo.exceptions.InvalidConfigException">
+<em class="property">exception </em><code class="descclassname">ommongo.exceptions.</code><code class="descname">InvalidConfigException</code><a class="headerlink" href="#ommongo.exceptions.InvalidConfigException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised when a bad value is passed in for a configuration that expects
+its values to obey certain constraints.</p>
+<dl class="method">
+<dt id="ommongo.exceptions.InvalidConfigException.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.exceptions.InvalidConfigException.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) &#8211;
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="data-exceptions">
+<h2>Data Exceptions<a class="headerlink" href="#data-exceptions" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="ommongo.exceptions.BadReferenceException">
+<em class="property">exception </em><code class="descclassname">ommongo.exceptions.</code><code class="descname">BadReferenceException</code><a class="headerlink" href="#ommongo.exceptions.BadReferenceException" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="ommongo.exceptions.BadReferenceException.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.exceptions.BadReferenceException.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) &#8211;
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt>
+<em class="property">exception </em><code class="descclassname">ommongo.exceptions.</code><code class="descname">BadValueException</code><span class="sig-paren">(</span><em>name</em>, <em>value</em>, <em>reason</em>, <em>cause=None</em><span class="sig-paren">)</span></dt>
+<dd><p>An exception which is raised when there is something wrong with a
+value</p>
+<dl class="method">
+<dt>
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Exception.with_traceback(tb) &#8211;
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="session-exceptions">
+<h2>Session Exceptions<a class="headerlink" href="#session-exceptions" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="ommongo.exceptions.TransactionException">
+<em class="property">exception </em><code class="descclassname">ommongo.exceptions.</code><code class="descname">TransactionException</code><a class="headerlink" href="#ommongo.exceptions.TransactionException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception which occurs when an invalid operation is called during a
+transaction</p>
+<dl class="method">
+<dt id="ommongo.exceptions.TransactionException.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.exceptions.TransactionException.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) &#8211;
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="ommongo.exceptions.SessionCacheException">
+<em class="property">exception </em><code class="descclassname">ommongo.exceptions.</code><code class="descname">SessionCacheException</code><a class="headerlink" href="#ommongo.exceptions.SessionCacheException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception when an error has occured with the MA caching mechanism</p>
+<dl class="method">
+<dt id="ommongo.exceptions.SessionCacheException.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ommongo.exceptions.SessionCacheException.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) &#8211;
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Exceptions</a><ul>
+<li><a class="reference internal" href="#field-exceptions">Field Exceptions</a></li>
+<li><a class="reference internal" href="#document-exceptions">Document Exceptions</a></li>
+<li><a class="reference internal" href="#data-exceptions">Data Exceptions</a></li>
+<li><a class="reference internal" href="#session-exceptions">Session Exceptions</a></li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">API documentation</a><ul>
+      <li>Previous: <a href="expressions/update_expressions.html" title="previous chapter">Update Expressions</a></li>
+      <li>Next: <a href="../examples/index.html" title="next chapter">Examples</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/exceptions.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    
+
+    
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Bapakode Open Source.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+    
+
+  </body>
+</html>
