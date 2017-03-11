@@ -2,7 +2,7 @@ import sys, os
 
 sys.path.insert(0, os.path.abspath('..'))
 
-html_theme = 'flask'
+
 
 # -- General configuration -----------------------------------------------------
 
@@ -26,9 +26,7 @@ autodoc_default_flags   = ['members', 'inherited-members', 'undoc-members']
 
 html_static_path    = ['static']
 htmlhelp_basename   = 'OmMongo'
-
-#html_theme          = "sphinx_rtd_theme"
-#html_theme_path     = [sphinx_rtd_theme.get_html_theme_path()]
+html_theme          = 'default'
 
 # -- Options for LaTeX output --------------------------------------------------
 
