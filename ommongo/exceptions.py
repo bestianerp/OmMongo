@@ -1,5 +1,5 @@
 from __future__ import print_function
-from mongoalchemy.py3compat import *
+from ommongo.py3compat import *
 
 class BadResultException(Exception):
     ''' Only raised right now when .one() finds more than one object '''
