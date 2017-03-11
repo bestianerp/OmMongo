@@ -1,0 +1,31 @@
+Exceptions
+========================================================
+
+Field Exceptions
+--------------------------------
+
+.. autoexception:: ommongo.exceptions.BadValueException
+
+.. autoexception:: ommongo.exceptions.BadFieldSpecification
+
+
+Document Exceptions
+------------------------------------
+
+.. autoexception:: ommongo.exceptions.DocumentException
+.. autoexception:: ommongo.exceptions.MissingValueException
+.. autoexception:: ommongo.exceptions.ExtraValueException
+.. autoexception:: ommongo.exceptions.FieldNotRetrieved
+.. autoexception:: ommongo.exceptions.InvalidConfigException
+
+Data Exceptions
+----------------------------------------
+
+.. autoexception:: ommongo.exceptions.BadReferenceException
+.. autoexception:: ommongo.exceptions.BadValueException
+
+Session Exceptions
+------------------------------------------
+
+.. autoexception:: ommongo.exceptions.TransactionException
+.. autoexception:: ommongo.exceptions.SessionCacheException

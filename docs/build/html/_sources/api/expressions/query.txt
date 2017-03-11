@@ -1,0 +1,16 @@
+
+Query Objects
+========================================================
+
+.. autoclass:: ommongo.query.Query
+   :members:
+   :undoc-members:
+
+.. autoclass:: ommongo.query.QueryResult
+   :members:
+   :undoc-members:
+
+
+
+
+

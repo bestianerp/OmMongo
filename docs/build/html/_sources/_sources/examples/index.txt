@@ -1,0 +1,6 @@
+
+Examples
+=================================
+
+No examples yet.  There are however code snippets throughout the documentation
+and a few files here: https://github.com/bapakode/OmMongo/tree/master/examples

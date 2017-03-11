@@ -1,0 +1,325 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ommongo.fields.mapping &#8212; OmMongo 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+     
+    
+    <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    
+    
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">OmMongo 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for ommongo.fields.mapping</h1><div class="highlight"><pre>
+<span></span><span class="c1"># The MIT License</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2010 Jeffrey Jenkins</span>
+<span class="c1">#</span>
+<span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># in the Software without restriction, including without limitation the rights</span>
+<span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
+<span class="c1"># furnished to do so, subject to the following conditions:</span>
+<span class="c1">#</span>
+<span class="c1"># The above copyright notice and this permission notice shall be included in</span>
+<span class="c1"># all copies or substantial portions of the Software.</span>
+<span class="c1">#</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="c1"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</span>
+<span class="c1"># THE SOFTWARE.</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">ommongo.py3compat</span> <span class="k">import</span> <span class="o">*</span>
+
+<span class="kn">from</span> <span class="nn">ommongo.fields.base</span> <span class="k">import</span> <span class="o">*</span>
+
+
+<div class="viewcode-block" id="DictField"><a class="viewcode-back" href="../../../api/schema/fields.html#ommongo.fields.DictField">[docs]</a><span class="k">class</span> <span class="nc">DictField</span><span class="p">(</span><span class="n">Field</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Stores String to ``value_type`` Dictionaries.  For non-string keys use</span>
+<span class="sd">        :class:`KVField`.  Strings also must obey the mongo key rules</span>
+<span class="sd">        (no ``.`` or ``$``)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+    <span class="n">valid_modifiers</span> <span class="o">=</span> <span class="n">SCALAR_MODIFIERS</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value_type</span><span class="p">,</span> <span class="n">default_empty</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; :param value_type: the Field type to use for the values</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">default_empty</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;default_f&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DictField</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_type</span> <span class="o">=</span> <span class="n">value_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_empty</span> <span class="o">=</span> <span class="n">default_empty</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_type</span><span class="p">,</span> <span class="n">Field</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">BadFieldSpecification</span><span class="p">(</span><span class="s2">&quot;DictField value type is not a field!&quot;</span><span class="p">)</span>
+    <span class="c1"># def set_default(self, value):</span>
+    <span class="c1">#     return super(DictField, self).set_default(value)</span>
+    <span class="c1"># def get_default(self):</span>
+    <span class="c1">#     if self.default_empty:</span>
+    <span class="c1">#         return {}</span>
+    <span class="c1">#     return super(DictField, self).get_default()</span>
+    <span class="c1"># default = property(get_default, set_default)</span>
+    <span class="k">def</span> <span class="nf">schema_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">super_schema</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">DictField</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">schema_json</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">value_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">value_type</span><span class="o">.</span><span class="n">schema_json</span><span class="p">(),</span>
+                    <span class="n">default_empty</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_empty</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">super_schema</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">has_autoload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_type</span><span class="o">.</span><span class="n">has_autoload</span>
+
+    <span class="k">def</span> <span class="nf">set_parent_on_subtypes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_type</span><span class="o">.</span><span class="n">_set_parent</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_validate_key_wrap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">basestring</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fail_validation</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s1">&#39;DictField keys must be of type basestring&#39;</span><span class="p">)</span>
+        <span class="k">if</span>  <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">key</span> <span class="ow">or</span> <span class="s1">&#39;$&#39;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fail_validation</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s1">&#39;DictField keys cannot contains &quot;.&quot; or &quot;$&quot;.  You may want a KVField instead&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_validate_key_unwrap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_key_wrap</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">validate_unwrap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Checks that value is a ``dict``, that every key is a valid MongoDB</span>
+<span class="sd">            key, and that every value validates based on DictField.value_type</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fail_validation_type</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_validate_key_unwrap</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">value_type</span><span class="o">.</span><span class="n">validate_unwrap</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">BadValueException</span> <span class="k">as</span> <span class="n">bve</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_fail_validation</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;Bad value for key </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span> <span class="n">cause</span><span class="o">=</span><span class="n">bve</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">validate_wrap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Checks that value is a ``dict``, that every key is a valid MongoDB</span>
+<span class="sd">            key, and that every value validates based on DictField.value_type</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fail_validation_type</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_validate_key_wrap</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">value_type</span><span class="o">.</span><span class="n">validate_wrap</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">BadValueException</span> <span class="k">as</span> <span class="n">bve</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_fail_validation</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;Bad value for key </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span> <span class="n">cause</span><span class="o">=</span><span class="n">bve</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Validates ``value`` and then returns a dictionary with each key in</span>
+<span class="sd">            ``value`` mapped to its value wrapped with ``DictField.value_type``</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_wrap</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">ret</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_type</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span>
+
+    <span class="k">def</span> <span class="nf">unwrap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Validates ``value`` and then returns a dictionary with each key in</span>
+<span class="sd">            ``value`` mapped to its value unwrapped using ``DictField.value_type``</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_unwrap</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">ret</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_type</span><span class="o">.</span><span class="n">unwrap</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+<div class="viewcode-block" id="KVField"><a class="viewcode-back" href="../../../api/schema/fields.html#ommongo.fields.KVField">[docs]</a><span class="k">class</span> <span class="nc">KVField</span><span class="p">(</span><span class="n">DictField</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Like a DictField, except it allows arbitrary keys.  The DB Format for</span>
+<span class="sd">        a ``KVField`` is ``[ { &#39;k&#39; : key, &#39;v&#39; : value }, ...]``.  Queries on</span>
+<span class="sd">        keys and values. can be done with ``.k`` and ``.v`` &#39;&#39;&#39;</span>
+    <span class="c1">#: If this kind of field can have sub-fields, this attribute should be True</span>
+    <span class="n">has_subfields</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_type</span><span class="p">,</span> <span class="n">value_type</span><span class="p">,</span> <span class="n">default_empty</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; :param key_type: the Field type to use for the keys</span>
+<span class="sd">            :param value_type: the Field type to use for the values</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">default_empty</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;default_f&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">KVField</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">value_type</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_empty</span> <span class="o">=</span> <span class="n">default_empty</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key_type</span><span class="p">,</span> <span class="n">Field</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">BadFieldSpecification</span><span class="p">(</span><span class="s2">&quot;KVField key type is not a field!&quot;</span><span class="p">)</span>
+        <span class="c1"># This is covered by DictField</span>
+        <span class="c1"># if not isinstance(value_type, Field):</span>
+        <span class="c1">#     raise BadFieldSpecification(&quot;KVField value type is not a field!&quot;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key_type</span> <span class="o">=</span> <span class="n">key_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key_type</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s1">&#39;k&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_type</span> <span class="o">=</span> <span class="n">value_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_type</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s1">&#39;v&#39;</span>
+    <span class="k">def</span> <span class="nf">schema_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">super_schema</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">KVField</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">schema_json</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">key_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">key_type</span><span class="o">.</span><span class="n">schema_json</span><span class="p">(),</span> <span class="o">**</span><span class="n">super_schema</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">set_parent_on_subtypes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_type</span><span class="o">.</span><span class="n">_set_parent</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key_type</span><span class="o">.</span><span class="n">_set_parent</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">has_autoload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_type</span><span class="o">.</span><span class="n">has_autoload</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_type</span><span class="o">.</span><span class="n">has_autoload</span>
+
+    <span class="k">def</span> <span class="nf">subfields</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Returns the k and v subfields, which can be accessed to do queries</span>
+<span class="sd">            based on either of them</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;k&#39;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_type</span><span class="p">,</span>
+            <span class="s1">&#39;v&#39;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_type</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">_validate_key_wrap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">key_type</span><span class="o">.</span><span class="n">validate_wrap</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">BadValueException</span> <span class="k">as</span> <span class="n">bve</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fail_validation</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s1">&#39;Bad value for key&#39;</span><span class="p">,</span> <span class="n">cause</span><span class="o">=</span><span class="n">bve</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">validate_unwrap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Expects a list of dictionaries with ``k`` and ``v`` set to the</span>
+<span class="sd">            keys and values that will be unwrapped into the output python</span>
+<span class="sd">            dictionary should have</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fail_validation_type</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">value_dict</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">cause</span> <span class="o">=</span> <span class="n">BadValueException</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">value_dict</span><span class="p">,</span> <span class="s1">&#39;Values in a KVField list must be dicts&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_fail_validation</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;Values in a KVField list must be dicts&#39;</span><span class="p">,</span> <span class="n">cause</span><span class="o">=</span><span class="n">cause</span><span class="p">)</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="n">value_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">value_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;v&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_fail_validation</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;Value had None for a key&#39;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">key_type</span><span class="o">.</span><span class="n">validate_unwrap</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">BadValueException</span> <span class="k">as</span> <span class="n">bve</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_fail_validation</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;Bad value for KVField key </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span> <span class="n">cause</span><span class="o">=</span><span class="n">bve</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">value_type</span><span class="o">.</span><span class="n">validate_unwrap</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">BadValueException</span> <span class="k">as</span> <span class="n">bve</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_fail_validation</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;Bad value for KFVield value </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span> <span class="n">cause</span><span class="o">=</span><span class="n">bve</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Expects a dictionary with the keys being instances of ``KVField.key_type``</span>
+<span class="sd">            and the values being instances of ``KVField.value_type``.  After validation,</span>
+<span class="sd">            the dictionary is transformed into a list of dictionaries with ``k`` and ``v``</span>
+<span class="sd">            fields set to the keys and values from the original dictionary.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_wrap</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_type</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_type</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">{</span> <span class="s1">&#39;k&#39;</span> <span class="p">:</span> <span class="n">k</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span> <span class="p">:</span> <span class="n">v</span> <span class="p">})</span>
+        <span class="k">return</span> <span class="n">ret</span>
+
+    <span class="k">def</span> <span class="nf">unwrap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Expects a list of dictionaries with ``k`` and ``v`` set to the</span>
+<span class="sd">            keys and values that will be unwrapped into the output python</span>
+<span class="sd">            dictionary should have.  Validates the input and then constructs the</span>
+<span class="sd">            dictionary from the list.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_unwrap</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">value_dict</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="n">value_dict</span><span class="p">[</span><span class="s1">&#39;k&#39;</span><span class="p">]</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">value_dict</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">]</span>
+            <span class="n">ret</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key_type</span><span class="o">.</span><span class="n">unwrap</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_type</span><span class="o">.</span><span class="n">unwrap</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    
+
+    
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Bapakode Open Source.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+    
+
+  </body>
+</html>

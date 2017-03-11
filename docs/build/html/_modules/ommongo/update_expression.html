@@ -1,0 +1,333 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ommongo.update_expression &#8212; OmMongo 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+     
+    
+    <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    
+    
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">OmMongo 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for ommongo.update_expression</h1><div class="highlight"><pre>
+<span></span><span class="c1"># The MIT License</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2010 Jeffrey Jenkins</span>
+<span class="c1">#</span>
+<span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># in the Software without restriction, including without limitation the rights</span>
+<span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
+<span class="c1"># furnished to do so, subject to the following conditions:</span>
+<span class="c1">#</span>
+<span class="c1"># The above copyright notice and this permission notice shall be included in</span>
+<span class="c1"># all copies or substantial portions of the Software.</span>
+<span class="c1">#</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="c1"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</span>
+<span class="c1"># THE SOFTWARE.</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">ommongo.py3compat</span> <span class="k">import</span> <span class="o">*</span>
+
+<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">wraps</span>
+<span class="kn">from</span> <span class="nn">pymongo</span> <span class="k">import</span> <span class="n">ASCENDING</span><span class="p">,</span> <span class="n">DESCENDING</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">copy</span><span class="p">,</span> <span class="n">deepcopy</span>
+
+<span class="kn">from</span> <span class="nn">ommongo.exceptions</span> <span class="k">import</span> <span class="n">BadValueException</span>
+<span class="kn">from</span> <span class="nn">ommongo.query_expression</span> <span class="k">import</span> <span class="n">QueryExpression</span><span class="p">,</span> <span class="n">BadQueryException</span><span class="p">,</span> <span class="n">flatten</span>
+<span class="kn">from</span> <span class="nn">ommongo.util</span> <span class="k">import</span> <span class="n">resolve_name</span>
+
+<div class="viewcode-block" id="UpdateExpression"><a class="viewcode-back" href="../../api/expressions/update_expressions.html#ommongo.update_expression.UpdateExpression">[docs]</a><span class="k">class</span> <span class="nc">UpdateExpression</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">query</span> <span class="o">=</span> <span class="n">query</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">session</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__upsert</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__multi</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__safe</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="UpdateExpression.upsert"><a class="viewcode-back" href="../../api/expressions/update_expressions.html#ommongo.update_expression.UpdateExpression.upsert">[docs]</a>    <span class="k">def</span> <span class="nf">upsert</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; If a document matching the query doesn&#39;t exist, create one &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__upsert</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="UpdateExpression.multi"><a class="viewcode-back" href="../../api/expressions/update_expressions.html#ommongo.update_expression.UpdateExpression.multi">[docs]</a>    <span class="k">def</span> <span class="nf">multi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Update multiple documents.  The Mongo default is to only update</span>
+<span class="sd">            the first matching document &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__multi</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="UpdateExpression.safe"><a class="viewcode-back" href="../../api/expressions/update_expressions.html#ommongo.update_expression.UpdateExpression.safe">[docs]</a>    <span class="k">def</span> <span class="nf">safe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Mark the query as a &quot;safe&quot; query with pymongo.</span>
+
+<span class="sd">            :param safe: Defaults to True. Force &quot;safe&quot; on or off</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__safe</span> <span class="o">=</span> <span class="n">safe</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="UpdateExpression.set"><a class="viewcode-back" href="../../api/expressions/update_expressions.html#ommongo.update_expression.UpdateExpression.set">[docs]</a>    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Usage is either:</span>
+
+<span class="sd">            set(self, qfield, value): Atomically set ``qfield`` to ``value``</span>
+
+<span class="sd">            OR</span>
+
+<span class="sd">            set(key1=value1, key2=value2): Atomically set the named arguments</span>
+<span class="sd">            on the current object to the values given.  This form cannot</span>
+<span class="sd">            update a sub-document</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">qfield</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">args</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atomic_op</span><span class="p">(</span><span class="s1">&#39;$set&#39;</span><span class="p">,</span> <span class="n">qfield</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="n">_atomic_op</span><span class="p">(</span><span class="s1">&#39;$set&#39;</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">ret</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UpdateException</span><span class="p">(</span><span class="s1">&#39;Invalid arguments for set.  Requires either two positional arguments or at least one keyword argument&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UpdateExpression.unset"><a class="viewcode-back" href="../../api/expressions/update_expressions.html#ommongo.update_expression.UpdateExpression.unset">[docs]</a>    <span class="k">def</span> <span class="nf">unset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qfield</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Atomically delete the field ``qfield``</span>
+<span class="sd">             .. note:: Requires server version **&gt;= 1.3.0+**.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># TODO: assert server version is &gt;1.3.0</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atomic_generic_op</span><span class="p">(</span><span class="s1">&#39;$unset&#39;</span><span class="p">,</span> <span class="n">qfield</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UpdateExpression.inc"><a class="viewcode-back" href="../../api/expressions/update_expressions.html#ommongo.update_expression.UpdateExpression.inc">[docs]</a>    <span class="k">def</span> <span class="nf">inc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Atomically increment ``qfield`` by ``value`` &#39;&#39;&#39;</span>
+        <span class="n">pairs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">pairs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">pairs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">pairs</span><span class="o">.</span><span class="n">extend</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UpdateException</span><span class="p">(</span><span class="s1">&#39;Invalid arguments for set.  Requires either two positional arguments or at least one keyword argument&#39;</span><span class="p">)</span>
+
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">for</span> <span class="n">qfield</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atomic_op</span><span class="p">(</span><span class="s1">&#39;$inc&#39;</span><span class="p">,</span> <span class="n">qfield</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+<div class="viewcode-block" id="UpdateExpression.append"><a class="viewcode-back" href="../../api/expressions/update_expressions.html#ommongo.update_expression.UpdateExpression.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qfield</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Atomically append ``value`` to ``qfield``.  The operation will</span>
+<span class="sd">            if the field is not a list field&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atomic_list_op</span><span class="p">(</span><span class="s1">&#39;$push&#39;</span><span class="p">,</span> <span class="n">qfield</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UpdateExpression.extend"><a class="viewcode-back" href="../../api/expressions/update_expressions.html#ommongo.update_expression.UpdateExpression.extend">[docs]</a>    <span class="k">def</span> <span class="nf">extend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qfield</span><span class="p">,</span> <span class="o">*</span><span class="n">value</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Atomically append each value in ``value`` to the field ``qfield`` &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atomic_list_op_multivalue</span><span class="p">(</span><span class="s1">&#39;$pushAll&#39;</span><span class="p">,</span> <span class="n">qfield</span><span class="p">,</span> <span class="o">*</span><span class="n">value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UpdateExpression.remove"><a class="viewcode-back" href="../../api/expressions/update_expressions.html#ommongo.update_expression.UpdateExpression.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qfield</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Atomically remove ``value`` from ``qfield``&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">QueryExpression</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atomic_expression_op</span><span class="p">(</span><span class="s1">&#39;$pull&#39;</span><span class="p">,</span> <span class="n">qfield</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atomic_list_op</span><span class="p">(</span><span class="s1">&#39;$pull&#39;</span><span class="p">,</span> <span class="n">qfield</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UpdateExpression.remove_all"><a class="viewcode-back" href="../../api/expressions/update_expressions.html#ommongo.update_expression.UpdateExpression.remove_all">[docs]</a>    <span class="k">def</span> <span class="nf">remove_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qfield</span><span class="p">,</span> <span class="o">*</span><span class="n">value</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Atomically remove each value in ``value`` from ``qfield``&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atomic_list_op_multivalue</span><span class="p">(</span><span class="s1">&#39;$pullAll&#39;</span><span class="p">,</span> <span class="n">qfield</span><span class="p">,</span> <span class="o">*</span><span class="n">value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UpdateExpression.add_to_set"><a class="viewcode-back" href="../../api/expressions/update_expressions.html#ommongo.update_expression.UpdateExpression.add_to_set">[docs]</a>    <span class="k">def</span> <span class="nf">add_to_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qfield</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Atomically add ``value`` to ``qfield``.  The field represented by</span>
+<span class="sd">            ``qfield`` must be a set</span>
+
+<span class="sd">            .. note:: Requires server version **1.3.0+**.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># TODO: check version &gt; 1.3.3</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atomic_list_op</span><span class="p">(</span><span class="s1">&#39;$addToSet&#39;</span><span class="p">,</span> <span class="n">qfield</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UpdateExpression.pop_last"><a class="viewcode-back" href="../../api/expressions/update_expressions.html#ommongo.update_expression.UpdateExpression.pop_last">[docs]</a>    <span class="k">def</span> <span class="nf">pop_last</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qfield</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Atomically pop the last item in ``qfield.``</span>
+<span class="sd">            .. note:: Requires version **1.1+**&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atomic_generic_op</span><span class="p">(</span><span class="s1">&#39;$pop&#39;</span><span class="p">,</span> <span class="n">qfield</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UpdateExpression.pop_first"><a class="viewcode-back" href="../../api/expressions/update_expressions.html#ommongo.update_expression.UpdateExpression.pop_first">[docs]</a>    <span class="k">def</span> <span class="nf">pop_first</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qfield</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Atomically pop the first item in ``qfield.``</span>
+<span class="sd">            .. note:: Requires version **1.1+**&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atomic_generic_op</span><span class="p">(</span><span class="s1">&#39;$pop&#39;</span><span class="p">,</span> <span class="n">qfield</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_atomic_list_op_multivalue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">qfield</span><span class="p">,</span> <span class="o">*</span><span class="n">value</span><span class="p">):</span>
+        <span class="n">qfield</span> <span class="o">=</span> <span class="n">resolve_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">qfield</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">qfield</span><span class="o">.</span><span class="n">valid_modifiers</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidModifierException</span><span class="p">(</span><span class="n">qfield</span><span class="p">,</span> <span class="n">op</span><span class="p">)</span>
+        <span class="n">wrapped</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+            <span class="n">wrapped</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">qfield</span><span class="o">.</span><span class="n">get_type</span><span class="p">()</span><span class="o">.</span><span class="n">item_type</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_data</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_data</span><span class="p">[</span><span class="n">op</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_data</span><span class="p">[</span><span class="n">op</span><span class="p">][</span><span class="n">qfield</span><span class="o">.</span><span class="n">get_absolute_name</span><span class="p">()]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">_atomic_list_op</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">qfield</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">qfield</span> <span class="o">=</span> <span class="n">resolve_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">qfield</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">qfield</span><span class="o">.</span><span class="n">valid_modifiers</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidModifierException</span><span class="p">(</span><span class="n">qfield</span><span class="p">,</span> <span class="n">op</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_data</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_data</span><span class="p">[</span><span class="n">op</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_data</span><span class="p">[</span><span class="n">op</span><span class="p">][</span><span class="n">qfield</span><span class="o">.</span><span class="n">get_absolute_name</span><span class="p">()]</span> <span class="o">=</span> <span class="n">qfield</span><span class="o">.</span><span class="n">child_type</span><span class="p">()</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">_atomic_expression_op</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">qfield</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">qfield</span> <span class="o">=</span> <span class="n">resolve_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">qfield</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">qfield</span><span class="o">.</span><span class="n">valid_modifiers</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidModifierException</span><span class="p">(</span><span class="n">qfield</span><span class="p">,</span> <span class="n">op</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_data</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_data</span><span class="p">[</span><span class="n">op</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_data</span><span class="p">[</span><span class="n">op</span><span class="p">][</span><span class="n">qfield</span><span class="o">.</span><span class="n">get_absolute_name</span><span class="p">()]</span> <span class="o">=</span> <span class="n">flatten</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">_atomic_op</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">qfield</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">qfield</span> <span class="o">=</span> <span class="n">resolve_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">qfield</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">qfield</span><span class="o">.</span><span class="n">valid_modifiers</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidModifierException</span><span class="p">(</span><span class="n">qfield</span><span class="p">,</span> <span class="n">op</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_data</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_data</span><span class="p">[</span><span class="n">op</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_data</span><span class="p">[</span><span class="n">op</span><span class="p">][</span><span class="n">qfield</span><span class="o">.</span><span class="n">get_absolute_name</span><span class="p">()]</span> <span class="o">=</span> <span class="n">qfield</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">_atomic_generic_op</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">qfield</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">qfield</span> <span class="o">=</span> <span class="n">resolve_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">qfield</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">qfield</span><span class="o">.</span><span class="n">valid_modifiers</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidModifierException</span><span class="p">(</span><span class="n">qfield</span><span class="p">,</span> <span class="n">op</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_data</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_data</span><span class="p">[</span><span class="n">op</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_data</span><span class="p">[</span><span class="n">op</span><span class="p">][</span><span class="n">qfield</span><span class="o">.</span><span class="n">get_absolute_name</span><span class="p">()]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">_get_upsert</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__upsert</span>
+
+    <span class="k">def</span> <span class="nf">_get_multi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__multi</span>
+
+<div class="viewcode-block" id="UpdateExpression.execute"><a class="viewcode-back" href="../../api/expressions/update_expressions.html#ommongo.update_expression.UpdateExpression.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Execute the update expression on the database &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">execute_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__safe</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="FindAndModifyExpression"><a class="viewcode-back" href="../../api/expressions/update_expressions.html#ommongo.update_expression.FindAndModifyExpression">[docs]</a><span class="k">class</span> <span class="nc">FindAndModifyExpression</span><span class="p">(</span><span class="n">UpdateExpression</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">new</span><span class="p">,</span> <span class="n">remove</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__new</span> <span class="o">=</span> <span class="n">new</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__remove</span> <span class="o">=</span> <span class="n">remove</span>
+        <span class="n">UpdateExpression</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_remove</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__remove</span>
+
+    <span class="k">def</span> <span class="nf">_get_new</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__new</span>
+
+<div class="viewcode-block" id="FindAndModifyExpression.execute"><a class="viewcode-back" href="../../api/expressions/update_expressions.html#ommongo.update_expression.FindAndModifyExpression.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Execute the find and modify expression on the database &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">execute_find_and_modify</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div></div>
+
+
+<span class="k">class</span> <span class="nc">UpdateException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Base class for exceptions related to updates &#39;&#39;&#39;</span>
+    <span class="k">pass</span>
+
+<span class="k">class</span> <span class="nc">InvalidModifierException</span><span class="p">(</span><span class="n">UpdateException</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Exception raised if a modifier was used which isn&#39;t valid for a field &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">op</span><span class="p">):</span>
+        <span class="n">UpdateException</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Invalid modifier for </span><span class="si">%s</span><span class="s1"> field: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">op</span><span class="p">))</span>
+
+<span class="k">class</span> <span class="nc">ConflictingModifierException</span><span class="p">(</span><span class="n">UpdateException</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Exception raised if conflicting modifiers are being used in the</span>
+<span class="sd">        update expression &#39;&#39;&#39;</span>
+    <span class="k">pass</span>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    
+
+    
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Bapakode Open Source.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+    
+
+  </body>
+</html>
