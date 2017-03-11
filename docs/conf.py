@@ -6,16 +6,14 @@ sys.path.insert(0, os.path.abspath('..'))
 
 # -- General configuration -----------------------------------------------------
 
-locale_dirs             = ['locale/']
-gettext_compact         = False
 extensions              = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.coverage', 'sphinx.ext.viewcode']
 templates_path          = ['_templates']
-source_suffix           = '.txt'
 master_doc              = 'index'
+source_suffix           = '.txt'
 project                 = u'OmMongo'
 copyright               = u'2017, Bapakode Open Source'
-version                 = '0.1'
-release                 = '0.1'
+version                 = '1.0'
+release                 = '1.0'
 exclude_patterns        = ['build', '_static', '_templates']
 pygments_style          = 'sphinx'
 autoclass_content       = 'both'

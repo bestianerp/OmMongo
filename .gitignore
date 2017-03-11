@@ -8,4 +8,4 @@ doctrees
 *.egg-info
 .coverage
 cover
-/build
+build
