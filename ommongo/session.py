@@ -318,7 +318,6 @@ class Session(object):
         if self.autoflush:
             return self.flush()
 
-
     def execute_find_and_modify(self, fm_exp):
         if self.in_transaction:
             raise TransactionException('Cannot find and modify in a transaction.')
@@ -504,4 +503,3 @@ class Session(object):
             self.clear_queue()
             self.clear_cache()
         return False
-

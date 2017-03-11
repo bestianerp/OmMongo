@@ -239,7 +239,6 @@ class Query(object):
             fields[f.get_absolute_name()] = f.fields_expression
         return fields
 
-
     def _apply(self, qe):
         ''' Apply a raw mongo query to the current raw query object'''
         self._apply_dict(qe.obj)
@@ -254,7 +253,6 @@ class Query(object):
             if not isinstance(self.__query[k], dict) or not isinstance(v, dict):
                 raise BadQueryException('Multiple assignments to a field must all be dicts.')
             self.__query[k].update(**v)
-
 
     def ascending(self, qfield):
         ''' Sort the result based on ``qfield`` in ascending order.  These calls
@@ -358,7 +356,6 @@ class Query(object):
             :param remove: Whether to remove the object before returning it
         '''
         return FindAndModifyExpression(self, new=new, remove=remove)
-
 
     def set(self, *args, **kwargs):
         ''' Refer to: :func:`~ommongo.update_expression.UpdateExpression.set`'''
