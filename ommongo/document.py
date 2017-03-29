@@ -183,6 +183,7 @@ class Document(object):
         # Mapping from attribute names to values.
         self._values = {}
         self.__extra_fields = {}
+        self.__index_score = 0
 
         cls = self.__class__
 
@@ -206,10 +207,14 @@ class Document(object):
         # Process any extra fields
         for k in kwargs:
             if k not in fields:
-                if self.config_extra_fields == 'ignore':
-                    self.__extra_fields[k] = kwargs[k]
+                if k == "__index_score":
+                    self.__index_score = kwargs[k]
                 else:
-                    raise ExtraValueException(k)
+                    if self.config_extra_fields == 'ignore':
+                        self.__extra_fields[k] = kwargs[k]
+                    else:
+                        raise ExtraValueException(k)
+
 
         self.__extra_fields_orig = dict(self.__extra_fields)
 
@@ -373,6 +378,11 @@ class Document(object):
             a dictionary of the fields which couldn't be mapped to the document.
         '''
         return self.__extra_fields
+
+    def get_index_score (self):
+        ''' Get index scores from full-text search.
+        '''
+        return self.__index_score
 
     @classmethod
     def get_fields(cls):

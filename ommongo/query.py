@@ -57,6 +57,8 @@ class Query(object):
         self._limit = None
         self._skip = None
         self._raw_output = False
+        self._search = False
+        self._createIndex = None
 
     def __iter__(self):
         return self.__get_query_result()
@@ -345,6 +347,17 @@ class Query(object):
         # TODO: make sure that this field represents a list
         qfield = resolve_name(self.type, qfield)
         self.filter(QueryExpression({ qfield : { '$nin' : [qfield.wrap_value(value) for value in values]}}))
+        return self
+
+    def search(self, value, createIndex=None):
+        ''' Full-text support, make sure that text index already exist on collection. Raise IndexNotFound if text index not exist.
+            **Examples**: ``query.search('pecel lele', createIndex=['FullName', 'Username'])``
+        '''
+        if createIndex:
+            self._createIndex = createIndex
+
+        self._search = True
+        self.filter(QueryExpression({'$text' : {'$search': value}}))
         return self
 
     def find_and_modify(self, new=False, remove=False):
