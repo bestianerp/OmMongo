@@ -285,6 +285,8 @@ class Session(object):
 					raise InvalidConfigException()
 			cursor = collection.find(query.query, {'__index_score': {'$meta': "textScore"}}, **kwargs)
 			cursor.sort([('__index_score', {'$meta': 'textScore'})])
+		elif query._aggregate:
+			cursor = collection.aggregate(query.query, **kwargs)
 		else:
 			cursor = collection.find(query.query, **kwargs)
 

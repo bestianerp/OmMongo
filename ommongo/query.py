@@ -59,6 +59,7 @@ class Query(object):
         self._raw_output = False
         self._search = False
         self._createIndex = None
+        self._aggregate = False
 
     def __iter__(self):
         return self.__get_query_result()
@@ -67,6 +68,8 @@ class Query(object):
     def query(self):
         """ The mongo query object which would be executed if this Query
             object were used """
+        if self._aggregate==True:
+            return self.__query
         return flatten(self.__query)
 
     def __get_query_result(self):
@@ -360,6 +363,13 @@ class Query(object):
         self.filter(QueryExpression({'$text' : {'$search': value}}))
         return self
 
+    def aggregate(self, raw_query):
+
+        self._aggregate = True
+        self.__query = raw_query
+        self._raw_output = True
+        return self.__get_query_result().cursor
+
     def find_and_modify(self, new=False, remove=False):
         ''' The mongo "find and modify" command.  Behaves like an update expression
             in that "execute" must be called to do the update and return the
@@ -433,6 +443,7 @@ class QueryResult(object):
             value = self.session._unwrap(self.type, value, fields=self.fields)
             if not isinstance(value, dict):
                 self.session.cache_write(value)
+
         return value
 
     def __getitem__(self, index):
