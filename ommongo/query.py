@@ -59,7 +59,12 @@ class Query(object):
         self._raw_output = False
         self._search = False
         self._createIndex = None
-        self._aggregate = False
+        self._rawquery = False
+        self._query_type = None
+        self._mapreduce_mapper = None
+        self._mapreduce_reducer = None
+        self._mapreduce_key = None
+        self._mapreduce_query = None
 
     def __iter__(self):
         return self.__get_query_result()
@@ -68,7 +73,7 @@ class Query(object):
     def query(self):
         """ The mongo query object which would be executed if this Query
             object were used """
-        if self._aggregate==True:
+        if self._rawquery==True:
             return self.__query
         return flatten(self.__query)
 
@@ -365,8 +370,20 @@ class Query(object):
 
     def aggregate(self, raw_query):
 
-        self._aggregate = True
+        self._rawquery = True
+        self._query_type = 'aggregate'
         self.__query = raw_query
+        self._raw_output = True
+        return self.__get_query_result().cursor
+
+    def map_reduce(self, mapper, reducer, key, query):
+
+        self._rawquery = True
+        self._query_type = 'map_reduce'
+        self._mapreduce_query = query
+        self._mapreduce_mapper = mapper
+        self._mapreduce_reducer = reducer
+        self._mapreduce_key = key
         self._raw_output = True
         return self.__get_query_result().cursor
 

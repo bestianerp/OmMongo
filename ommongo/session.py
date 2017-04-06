@@ -285,8 +285,11 @@ class Session(object):
 					raise InvalidConfigException()
 			cursor = collection.find(query.query, {'__index_score': {'$meta': "textScore"}}, **kwargs)
 			cursor.sort([('__index_score', {'$meta': 'textScore'})])
-		elif query._aggregate:
-			cursor = collection.aggregate(query.query, **kwargs)
+		elif query._rawquery:
+			if query._query_type=='aggregate':
+				cursor = collection.aggregate(query.query, **kwargs)
+			elif query._query_type=='map_reduce':
+				cursor = collection.map_reduce( query._mapreduce_mapper, query._mapreduce_reducer, query._mapreduce_key, query=query._mapreduce_query)
 		else:
 			cursor = collection.find(query.query, **kwargs)
 
