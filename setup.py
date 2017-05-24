@@ -3,7 +3,7 @@
 import setuptools
 from distutils.core import setup
 
-VERSION = '1.0'
+VERSION = '1.1.1'
 DESCRIPTION = 'Document-Object Mapper/Toolkit for Mongo Databases'
 
 setup(
