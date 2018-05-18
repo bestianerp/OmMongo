@@ -356,7 +356,7 @@ class Field(object):
         '''
         raise NotImplementedError()
 
-    def validate_unwrap(self, value):
+    def validate_unwrap(self, value, session=None):
         ''' Called before unwrapping.  Calls :func:`~Field.is_valid_unwrap` and raises
             a :class:`BadValueException` if validation fails
 

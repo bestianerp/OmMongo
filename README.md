@@ -33,9 +33,3 @@ Test setup.py
 Nose Tests
 
 	nosetests --cover-tests --cover-erase --with-coverage --cover-package ommongo
-
-### Release Notes
-
-##### v.1.0
-
-- fork from MongoAlchemy project
