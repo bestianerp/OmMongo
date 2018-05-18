@@ -3,7 +3,6 @@
 [![Build Status](https://travis-ci.org/bapakode/OmMongo.svg?branch=master)](https://travis-ci.org/bapakode/OmMongo)
 [![Coverage Status](https://coveralls.io/repos/github/bapakode/OmMongo/badge.svg?branch=master)](https://coveralls.io/github/bapakode/OmMongo?branch=master)
 [![Python Version Support](https://img.shields.io/badge/python-2.7%20--%203.5-blue.svg)](https://www.python.org/)
-[![Current Version](https://img.shields.io/badge/version-1.0-green.svg)](https://github.com/bapakode/OmMongo/releases)
 
 OmMongo is Object Relational Mapping for MongoDB, this project is forked from MongoAlchemy project.
 
