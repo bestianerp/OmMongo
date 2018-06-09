@@ -271,7 +271,7 @@ class Session(object):
 				kwargs['fields'] = query._fields_expression()
 
 		collection = self.db[query.type.get_collection_name()]
-
+		
 		if query._search:
 			index_fields = query._createIndex
 			if index_fields:
@@ -287,7 +287,7 @@ class Session(object):
 			cursor.sort([('__index_score', {'$meta': 'textScore'})])
 		elif query._rawquery:
 			if query._query_type=='aggregate':
-				cursor = collection.aggregate(query.query, **kwargs)
+				cursor = collection.aggregate(query.query, cursor={}, **kwargs)
 			elif query._query_type=='map_reduce':
 				cursor = collection.map_reduce( query._mapreduce_mapper, query._mapreduce_reducer, query._mapreduce_key, query=query._mapreduce_query)
 		else:
