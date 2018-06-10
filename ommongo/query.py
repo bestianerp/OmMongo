@@ -358,7 +358,7 @@ class Query(object):
         self.filter(QueryExpression({ qfield : { '$nin' : [qfield.wrap_value(value) for value in values]}}))
         return self
 
-   def search(self, value, createIndex=None):
+    def search(self, value, createIndex=None):
         ''' Full-text support, make sure that text index already exist on collection. Raise IndexNotFound if text index not exist.
             
             **Examples**: ``query.search('pecel lele', createIndex=['FullName', 'Username'])``
