@@ -26,11 +26,12 @@ from ommongo.py3compat import *
 from functools import wraps
 from pymongo import ASCENDING, DESCENDING
 from copy import copy, deepcopy
+from re import IGNORECASE, compile as re_compile
 
 from ommongo.exceptions import BadValueException, BadResultException
 from ommongo.query_expression import QueryExpression, BadQueryException, flatten, FreeFormDoc
 from ommongo.update_expression import UpdateExpression, FindAndModifyExpression
-from ommongo.util import resolve_name
+from ommongo.util import resolve_name, FieldNotFoundException
 
 
 class Query(object):
@@ -357,8 +358,9 @@ class Query(object):
         self.filter(QueryExpression({ qfield : { '$nin' : [qfield.wrap_value(value) for value in values]}}))
         return self
 
-    def search(self, value, createIndex=None):
+   def search(self, value, createIndex=None):
         ''' Full-text support, make sure that text index already exist on collection. Raise IndexNotFound if text index not exist.
+            
             **Examples**: ``query.search('pecel lele', createIndex=['FullName', 'Username'])``
         '''
         if createIndex:
@@ -375,6 +377,47 @@ class Query(object):
         self.__query = raw_query
         self._raw_output = True
         return self.__get_query_result().cursor
+
+    def query_bypass(self, query, raw_output=True):
+        ''' Bypass query meaning that field check and validation is skipped, then query object directly executed by pymongo.
+        
+            :param raw_output: Skip OmMongo ORM layer (default: True)
+        '''
+        if not isinstance(query, dict):
+            raise BadQueryException('Query must be dict.')
+
+        self.__query = query
+        if raw_output:
+            self._raw_output = True
+            return self.__get_query_result().cursor
+        else:
+            return self
+
+    def filter_like(self, **filters):
+        ''' Filter query using re.compile().
+
+            **Examples**: ``query.filter_like(Name="andi")``
+        '''
+        Query = {}
+        for name, value in filters.items():
+            name = resolve_name(self.type, name)
+            Query[name] = re_compile(value, IGNORECASE)
+        self.filter(QueryExpression(Query))
+        return self
+    
+    def filter_dict(self, query, **kwargs):
+        ''' Filter for :func:`~ommongo.fields.mapping.DictField`.
+
+            **Examples**: ``query.filter_dict({"User.Fullname": "Oji"})``
+        '''
+        for name, value in query.items():
+            field = name.split(".")[0]
+            try:
+                getattr(self.type, field)
+            except AttributeError:
+                raise FieldNotFoundException("Field not found %s" % (field))
+        self.query_bypass(query, raw_output=False, **kwargs)
+        return self
 
     def map_reduce(self, mapper, reducer, key, query):
 
